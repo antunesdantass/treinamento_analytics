@@ -25,3 +25,15 @@ Histograma da quantidade de amigos dos usuários analisados
 qplot(x = friend_count, data = fbFiles)
 ```
 
+Limitando os dados do eixo x para usuários que possuem até mil amigos
+
+```{r}
+qplot(x = friend_count, data = fbFiles, xlim = c(0, 1000))
+```
+
+Ajustando o binwidth para 25
+
+```{r}
+qplot(x = friend_count, data = fbFiles, xlim = c(0, 1000), binwidth = 25)
+```
+
