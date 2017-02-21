@@ -127,9 +127,46 @@ Qual gênero curte mais páginas e qual a contagem de curtidas do gênero mascul
 by(fbFiles$www_likes, fbFiles$gender, sum)
 ```
 
-Box plot:
+Box plot: O eixo dos x será a variável categórica, o y a contagem. Isso acontecerá em todos os boxplots.
 
 ```{r}
-qplot(x = )
+qplot(x = gender,
+      y = friend_count,
+      data = subset(fbFiles, !is.na(gender)),
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0, 1000))
+```
+
+Como uma grande quantidade de dados está concentrada na amostra de 0 a 250 amigos, gera-se um novo boxplot para auxiliar na leitura desse subgrupo.
+
+```{r}
+qplot(x = gender,
+      y = friend_count,
+      data = subset(fbFiles, !is.na(gender)),
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0, 250))
+```
+
+Análise de qual gênero fez mais requisições de amizade: 
+
+```{r}
+qplot(x = gender,
+      y = friendships_initiated,
+      data= subset(fbFiles, !is.na(gender)),
+      geom = 'boxplot') +
+  coord_cartesian(ylim = c(0, 500))
+```
+
+```{r}
+by(fbFiles$friendships_initiated, fbFiles$gender, summary)
+```
+
+Quiz: Getting Logical
+
+```{r}
+mobile_check_in <- NA
+fbFiles$mobile_check_in <- ifelse(fbFiles$mobile_likes > 0, 1, 0)
+fbFiles$mobile_check_in <- factor(fbFiles$mobile_check_in)
+summary(fbFiles$mobile_check_in)
 ```
 
