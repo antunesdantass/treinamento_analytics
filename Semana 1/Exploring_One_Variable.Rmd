@@ -1,0 +1,135 @@
+---
+title: "Explore One Variable"
+author: "Antunes Dantas"
+date: "17 de fevereiro de 2017"
+output: html_document
+---
+
+Mudando o diretório e carregando o arquivo do Facebook
+```{r}
+setwd('/home/antunessilva/Downloads')
+fbFiles <- read.csv('pseudo_facebook.tsv', sep = '\t')
+```
+
+Histograma do dia de nascimento dos usuários
+```{r}
+library(ggplot2)
+qplot(x = dob_day, data = fbFiles) +
+    scale_x_continuous(breaks=1:31) +
+    facet_wrap(~dob_month, ncol = 3)
+```
+
+Histograma da quantidade de amigos dos usuários analisados
+
+```{r}
+qplot(x = friend_count, data = fbFiles)
+```
+
+Limitando os dados do eixo x para usuários que possuem até mil amigos
+
+```{r}
+qplot(x = friend_count, data = fbFiles, xlim = c(0, 1000))
+```
+
+Ajustando o binwidth para 25 e cria os gráficos separando por sexo.
+
+```{r}
+qplot(x = friend_count, data = fbFiles, binwidth = 25) +
+  scale_x_continuous(limits = c(0,1000), breaks = seq(0, 1000, 50)) +
+    facet_wrap(~gender)
+```
+
+Retirando os dados NA do gráfico.
+
+```{r}
+qplot(x = friend_count, data = subset(fbFiles, !is.na(gender)), binwidth = 25) +
+  scale_x_continuous(limits = c(0,1000), breaks = seq(0, 1000, 50)) +
+    facet_wrap(~gender)
+```
+
+Estatísticas por Gênero
+
+```{r}
+by(fbFiles$friend_count, fbFiles$gender, summary)
+```
+
+Tenure, alterando as cores do gráfico para melhor visualização. Foi alterado a cor da borda e do preenchimento das colunas.
+
+```{r}
+qplot(x = tenure/365, data = fbFiles, binwidth = .25, color = I('black'), fill = I('#099DD9')) +
+  scale_x_continuous(breaks = seq(1,7,1), limits = c(0, 7))
+```
+
+
+Para melhorar a legibilidade do gráfico, interessante colocar rótulos (legendas) para os eixos.
+
+```{r}
+qplot(x = tenure/365, data = fbFiles, binwidth = .25,
+  xlab = 'Número de anos usando o Facebook',
+  ylab = 'Número de usuários da amostra',
+  color = I('black'), fill = I('#099DD9')) +
+  scale_x_continuous(breaks = seq(1,7,1), limits = c(0, 7))
+```
+
+Criando um histograma com a informação de idade dos usuários do Facebook
+
+```{r}
+qplot(x = age, data = fbFiles, binwidth = 1,
+      color = I('black'), fill = I('#099DD9')) +
+  scale_x_continuous(breaks = seq(13, 113, 5))
+```
+
+Criar três gráficos com os dados de contagem de amigos dos usuários, tentando modificar a escala através de funções para melhorar a visualização. Instalação do pacote gridExtra para montar vários gráficos em uma imagem.
+
+```{r}
+install.packages('gridExtra')
+library('gridExtra')
+```
+
+
+```{r}
+normalPlot = qplot(x = friend_count, data = fbFiles, xlim = c(0, 1000),
+      color = I('black'), fill = I('#099DD9'))
+
+logPlot = normalPlot + scale_x_log10()
+
+sqrtPlot = normalPlot + scale_x_sqrt()
+
+grid.arrange(normalPlot, logPlot, sqrtPlot, ncol = 1)
+```
+
+É melhor usar a label scale_x_function pois assim a escala mostrada será baseada no número real dos nossos dados, não no valor gerado pela função.
+
+Usando Frequency Poligons, é possível ter uma boa visualização quando deseja-se comparar distribuições. É interessante usar um valor proporcional para a escala para facilitar a compreensão da ideia de muito ou pouco para aquela distribuição de dados.
+
+```{r}
+qplot(x = friend_count, y = ..count../sum(..count..),
+      xlab = 'Quantidade de amigos',
+      ylab = 'Proporção entre usuários e quantidade de amigos',
+      data = subset(fbFiles, !is.na(gender)), 
+      binwidth = 10, geom = 'freqpoly', color = gender) +
+  scale_x_continuous(lim = c(0,1000), breaks = seq(1, 1000,50))
+```
+
+Quiz: Criando um frequency polygon para mostrar qual gênero da mais likes.
+
+```{r}
+qplot(x = www_likes,
+      data = subset(fbFiles, !is.na(gender)), 
+      geom = 'freqpoly', color = gender) +
+  scale_x_continuous() +
+  scale_x_log10()
+```
+
+Qual gênero curte mais páginas e qual a contagem de curtidas do gênero masculino?
+
+```{r}
+by(fbFiles$www_likes, fbFiles$gender, sum)
+```
+
+Box plot:
+
+```{r}
+qplot(x = )
+```
+
