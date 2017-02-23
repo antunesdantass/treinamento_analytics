@@ -71,3 +71,39 @@ qplot(data = diamonds, x = diamonds$price * diamonds$carat,
 ```
 
 Quiz: Price Box Plots
+
+```{r}
+qplot(geom = 'boxplot',
+      data = diamonds,
+      y = diamonds$price,
+      x = diamonds$cut) +
+  coord_cartesian(ylim = c(326, 18820))
+```
+
+Quiz: Interquartile Range - IQR
+
+```{r}
+summary(subset(diamonds, color == "D"))
+IQR(subset(diamonds, color == "D")$price)
+IQR(subset(diamonds, color == "J")$price)
+```
+
+Quiz: Price per Carat Box Plots by Color
+
+```{r}
+qplot(geom = 'boxplot',
+      data = diamonds,
+      x = diamonds$color,
+      y = diamonds$price/diamonds$carat)
+```
+
+Quiz: Carat Frequency Polygon
+
+```{r}
+qplot(geom = 'freqpoly',
+      data = diamonds,
+      x = diamonds$carat, binwidth = .1) +
+  scale_x_continuous(breaks = c(0.1, 0.3, 0.8, 1.01, 1.6, 2.0, 3.0, 5.0))
+```
+
+
