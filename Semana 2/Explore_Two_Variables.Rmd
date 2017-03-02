@@ -1,0 +1,43 @@
+---
+title: "Explore_Two_Variables"
+author: "Antunes Dantas"
+date: "2 de março de 2017"
+output: html_document
+---
+
+Configurando o ambiente:
+
+```{r}
+library(ggplot2)
+pf <- read.csv("~/Downloads/pseudo_facebook.tsv", sep = '\t')
+```
+
+Gráfico de dispersão entre contagem de usuarios e idade
+
+```{r}
+qplot(age, friend_count, data = pf)
+```
+
+Usando o GGPLOT para gerar
+
+```{r}
+ggplot(data = pf, aes(x = age, y = friend_count)) + 
+  geom_point() +
+  xlim(13, 90)
+```
+
+Usando coloração para melhorar a legibilidade
+
+```{r}
+ggplot(data = pf, aes(x = age, y = friend_count)) + 
+  geom_point(alpha = 1/20) +
+  xlim(13, 90)
+```
+
+Usando o jitter para dar mostra o ruido entre as idades
+```{r}
+ggplot(data = pf, aes(x = age, y = friend_count)) + 
+  geom_jitter(alpha = 1/20) +
+  xlim(13, 90)
+```
+
