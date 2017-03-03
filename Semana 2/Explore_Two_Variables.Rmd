@@ -61,8 +61,16 @@ ggplot(data = pf, aes(x = age, y = friendships_initiated)) +
 Quiz: Conditional Means
 
 ```{r}
-install.packages('dplyr')
 library(dplyr)
 
+pf.fc_by_age <- pf %>%
+  group_by(age) %>%
+  summarise(friend_count_mean = mean(friend_count),
+            friend_count_medin = median(friend_count),
+            n = n()) %>%
+  arrange(age)
+
+ggplot(data = pf.fc_by_age, aes(x = age, y = friend_count_mean)) +
+  geom_line()
 ```
 
