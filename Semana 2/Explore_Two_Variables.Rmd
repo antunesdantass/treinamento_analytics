@@ -74,3 +74,128 @@ ggplot(data = pf.fc_by_age, aes(x = age, y = friend_count_mean)) +
   geom_line()
 ```
 
+Overlaying Summaries with Raw Data
+
+O gráfico laranja representa a distribuição entre a idade dos usuários e a sua quantidade de amigos. Os gráficos pontilhados representam a mesma distribuição, porém levando em conta uma porcentagem de 10, 50 e 90% dos dados da amostra. É possível ver, por exemplo, que 90% dos usuários da amostra tem menos de 1000 amigos.
+
+```{r}
+ggplot(aes(x = age, y = friend_count), data = pf) + 
+  xlim(13, 90) +
+  geom_point(alpha = 1/20,
+             position = position_jitter(h = 0),
+             color = 'orange') +
+  coord_trans(y = 'sqrt') +
+  geom_line(stat = 'summary', fun.y = mean) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args=list(probs=0.1), linetype = 2, color = 'blue') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args=list(probs=0.5), linetype = 2, color = 'blue') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args=list(probs=0.9), linetype = 2, color = 'blue')
+```
+
+É possĩvel ter uma visão  mais detalhada dos gráficos limitando o eixo x a uma faixa de 13-70 anos (que são os mais expressivos) e o y a uma faixa de 0-1000 amigos, que é onde está concentrada cerca de 90% dos casos.
+
+```{r}
+ggplot(aes(x = age, y = friend_count), data = pf) +
+  coord_cartesian(xlim = c(13, 70), ylim = c(0, 1000)) +
+  geom_point(alpha = 1/20,
+             position = position_jitter(h = 0),
+             color = 'orange') +
+  geom_line(stat = 'summary', fun.y = mean) +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args=list(probs=0.1), linetype = 2, color = 'blue') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args=list(probs=0.5), linetype = 2, color = 'blue') +
+  geom_line(stat = 'summary', fun.y = quantile, fun.args=list(probs=0.9), linetype = 2, color = 'blue')
+```
+
+Correlação entre as variáveis Age e Friend_Count. É possível ver que não há uma correlação significativa entre as duas variáveis.
+
+```{r}
+cor.test(pf$age, pf$friend_count, methor = 'pearson')
+```
+
+Excluindo os dados de usuário acima de 70 anos, que tem uma grande probabilidade de estarem errados, é possível ver que há uma certa correlação entre as variáveis.
+
+```{r}
+with(subset(pf, age <= 70), cor.test(age, friend_count, methor = 'pearson'))
+```
+
+Quiz: Create Scatterplots
+
+Scatterplot entre likes_received e www_likes_received.
+
+```{r}
+ggplot(data = pf, aes(x = www_likes_received, y = likes_received)) +
+  geom_point()
+```
+
+Como há uma grande concentração de dados, é importante limitar os eixos para que possamos fazer uma melhor leitura.
+
+```{r}
+ggplot(data = pf, aes(x = www_likes_received, y = likes_received)) +
+  geom_point() +
+  xlim(0, quantile(pf$www_likes_received, 0.95)) +
+  ylim(0, quantile(pf$likes_received, 0.95)) +
+  geom_smooth(method = 'lm', color = 'red')
+```
+
+A correlação entre likes_received e www_likes_received é dada por:
+
+```{r}
+cor.test(pf$likes_received, pf$www_likes_received)
+```
+
+O motivo da correlação entre elas é tão alto por causa da natureza das variáveis. Uma delas é superconjunto da outra.
+
+Quiz: More Caution with Correlation
+
+```{r}
+install.packages('alr3')
+library(alr3)
+```
+
+Gráfico de dispersão entre a temperatura e o mês, disponíveis no dataset Mitchell do pacote alr3
+
+```{r}
+ggplot(data = Mitchell, aes(x = Month, y = Temp)) +
+  geom_point()
+```
+
+A correlação entre Temperatura e Mês
+
+```{r}
+cor.test(Mitchell$Month, Mitchell$Temp)
+```
+
+
+
+```{r}
+ggplot(data = Mitchell, aes(x = Month, y = Temp)) +
+  geom_line() +
+  scale_x_discrete(breaks = seq(0, 203, 12))
+```
+
+Voltando a analisar os dados de Numero de Amigos x Idade do Facebook, é interessante diferenciar a idade dos usuarios através do mês de nascimento, diferenciando em idade duas pessoas que tem 36 anos, mas nasceram em meses distintos.
+
+```{r}
+ pf$age_with_months <- pf$age + (1 - pf$dob_month / 12) 
+```
+
+Criando um novo dataset como informações da idade, em meses, dos usuários.
+
+```{r}
+library(dplyr)
+pf.fc_by_month <- pf %>%
+  group_by(age_with_months) %>%
+  summarise(friend_count_mean = mean(friend_count),
+            friend_count_median = median(friend_count),
+            n = n()) %>%
+  arrange(age_with_months)
+
+head(pf.fc_by_month)
+```
+
+Plotando o gráfico para as variáveis age_with_months e friend_count_mean
+
+```{r}
+ggplot(data = subset(pf.fc_by_month, age_with_months < 71), aes(x = age_with_months, y = friend_count_mean)) +
+  geom_line()
+```
+
